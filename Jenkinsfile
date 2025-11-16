@@ -44,6 +44,22 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy to EC2') {
+            steps {
+                script {
+                    echo "Deploying container to EC2..."
+                    // 1. Stop existing container (ignore error if it doesn't exist)
+                    sh "docker stop node-app || true"
+                    
+                    // 2. Remove existing container (ignore error if it doesn't exist)
+                    sh "docker rm node-app || true"
+                    
+                    // 3. Run the new container mapping port 3000
+                    sh "docker run -d -p 3000:3000 --name node-app ${REGISTRY_URL}/${ECR_REPO_NAME}:${IMAGE_TAG}"
+                }
+            }
+        }
     }
     
     post {
